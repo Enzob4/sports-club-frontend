@@ -23,120 +23,122 @@ export default function Clubs() {
   }, []);
 
   const loadData = async () => {
-    await Promise.all([fetchClubs(), fetchMyClubs()]);
-    setLoading(false);
+    try {
+      await Promise.all([fetchClubs(), fetchMyClubs()]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchClubs = async () => {
-    try {
-      const response = await api.get("/clubs");
-      const data =
-        response.data["hydra:member"] ||
-        response.data["member"] ||
-        [];
-      setClubs(data);
-    } catch (err) {
-      console.error("Fetch clubs error", err);
-    }
-  };
+  const response = await api.get("/clubs");
+  const data = response.data["hydra:member"] || response.data["member"] || response.data;
+  setClubs(Array.isArray(data) ? data : []);
+};
 
   const fetchMyClubs = async () => {
-    try {
-      const response = await api.get("/me/clubs");
-      setMyClubs(response.data);
-    } catch (error) {
-      console.error("Fetch my clubs error", error);
-    }
+    const response = await api.get("/me/clubs");
+    setMyClubs(response.data);
   };
 
-  const extractIdFromIri = (iri: string): number => {
-    return parseInt(iri.split("/").pop() || "0");
-  };
-
-  const getMembership = (clubId: number) => {
-    return myClubs.find((c) => c.id === clubId);
-  };
+  const extractIdFromIri = (iri: string): number => parseInt(iri.split("/").pop() || "0");
 
   const joinClub = async (clubId: number) => {
     try {
       await api.post(`/clubs/${clubId}/join`);
       await fetchMyClubs();
-      alert("Vous avez rejoint le club !");
     } catch (err: any) {
-      if (err.response?.status === 409) {
-        alert("Déjà membre.");
-      } else {
-        alert("Erreur lors de l'adhésion.");
-      }
+      alert(err.response?.status === 409 ? "Déjà membre." : "Erreur lors de l'adhésion.");
     }
   };
 
-  const deleteClub = async (clubId: number) => {
-  if (!confirm("Voulez-vous vraiment supprimer ce club ?")) return;
-
-  try {
-    const response = await api.delete(`/clubs/${clubId}`);
-    
-    // Le code 204 ou 200 sont des succès
-    if (response.status === 204 || response.status === 200) {
-      console.log("Suppression réussie !");
-      // On rafraîchit les données
-      await loadData(); 
-      alert("Club supprimé avec succès.");
+  const handleDelete = async (clubId: number) => {
+    if (!confirm("Voulez-vous supprimer ce club définitivement ?")) return;
+    try {
+      await api.delete(`/clubs/${clubId}`);
+      setClubs(prev => prev.filter(c => extractIdFromIri(c["@id"]) !== clubId));
+    } catch {
+      alert("Action non autorisée.");
     }
-  } catch (err: any) {
-    console.error("Erreur lors de la suppression:", err.response);
-    alert(`Erreur : ${err.response?.data?.detail || "Action non autorisée"}`);
-  }
-};
+  };
 
-  if (loading) return <div>Chargement...</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+  );
 
   return (
-    <div style={{ padding: 20 }}>
-      <Link to="/create-club">
-        <button>Create Club</button>
-      </Link>
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Liste des Clubs</h1>
+          <p className="text-gray-500 mt-1">Découvrez et rejoignez les communautés sportives.</p>
+        </div>
+        <Link to="/create-club">
+          <button className="inline-flex items-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition-all active:scale-95">
+            <span className="mr-2">+</span> Créer un club
+          </button>
+        </Link>
+      </div>
 
-      <h1>Liste des Clubs</h1>
-
-      <div style={{ display: "grid", gap: "20px" }}>
+      {/* Grid Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {clubs.map((club) => {
           const clubId = extractIdFromIri(club["@id"]);
-          const membership = getMembership(clubId);
+          const membership = myClubs.find((c) => c.id === clubId);
 
           return (
-            <div
-              key={club["@id"]}
-              style={{ border: "1px solid #ccc", padding: 15 }}
-            >
-              <h3>{club.name}</h3>
-              <p>{club.description}</p>
+            <div key={club["@id"]} className="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-start mb-4">
+                  <div className="h-12 w-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center font-bold text-xl">
+                    {club.name.charAt(0)}
+                  </div>
+                  {membership?.userRole === "OWNER" && (
+                    <span className="text-[10px] uppercase tracking-widest font-bold bg-amber-100 text-amber-700 px-2 py-1 rounded">
+                      Propriétaire
+                    </span>
+                  )}
+                </div>
+                
+                <h3 className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+                  {club.name}
+                </h3>
+                <p className="text-gray-600 text-sm mt-2 line-clamp-3">
+                  {club.description}
+                </p>
+              </div>
 
-              {/* Pas membre */}
-              {!membership && (
-                <button onClick={() => joinClub(clubId)}>
-                  Rejoindre
-                </button>
-              )}
-
-              {/* Membre simple */}
-              {membership?.userRole === "MEMBER" && (
-                <span style={{ color: "green", fontWeight: "bold" }}>✓ Membre</span>
-              )}
-
-              {/* Propriétaire */}
-              {membership?.userRole === "OWNER" && (
-                <>
-                  <span style={{ color: "blue", fontWeight: "bold" }}>★ Owner </span>
-                  <button
-                    style={{ marginLeft: 10, backgroundColor: "#ff4d4d", color: "white", border: "none", padding: "5px 10px", borderRadius: "4px" }}
-                    onClick={() => deleteClub(clubId)}
+              <div className="mt-6 pt-4 border-t border-gray-50 flex items-center justify-between">
+                {/* Logic Boutons */}
+                {!membership ? (
+                  <button 
+                    onClick={() => joinClub(clubId)}
+                    className="w-full py-2 bg-gray-900 hover:bg-black text-white rounded-lg text-sm font-medium transition-colors"
                   >
-                    Delete
+                    Rejoindre le club
                   </button>
-                </>
-              )}
+                ) : (
+                  <div className="flex w-full items-center justify-between">
+                    <span className="inline-flex items-center text-sm font-medium text-green-600">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+                      Membre
+                    </span>
+                    
+                    {membership.userRole === "OWNER" && (
+                      <button 
+                        onClick={() => handleDelete(clubId)}
+                        className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-md transition-colors"
+                        title="Supprimer le club"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
