@@ -1,73 +1,61 @@
-# React + TypeScript + Vite
+# sports-club-front
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+sports-club est une plateforme moderne de gestion de clubs sportifs. Cette interface (Frontend) permet aux utilisateurs de créer, rejoindre et gérer des communautés sportives avec une expérience fluide et élégante.
 
-Currently, two official plugins are available:
+## Fonctionnalités
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Authentification complète : Système de login/JWT avec gestion d'état global.
 
-## React Compiler
+- Accès Sécurisé : Protection des routes sensibles et gestion des rôles (Owner/Member).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Gestion de Clubs : Création de clubs et visualisation des adhésions.
 
-## Expanding the ESLint configuration
+- Profil Utilisateur : Espace personnel avec récupération dynamique des données.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Design Premium : Interface responsive bâtie avec Tailwind CSS v4 et effets de glassmorphism.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Stack Technique
+- Framework : React (Vite.js)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Langage : TypeScript
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Style : Tailwind CSS v4
+
+- Navigation : React Router 7
+
+- Client API : Axios
+
+- Gestion d'état : Context API
+
+## Installation
+
+1. **Cloner** le dépôt
+```bash
+git clone https://github.com/Enzob4/sports-club-frontend.git
+cd sports-club-front
+```
+2. **Installer** les dépendances
+```bash
+npm install
+```
+3. **Configuration** Créez un fichier .env à la racine et configurez l'URL de votre API Symfony
+```bash
+VITE_API_BASE_URL=http://localhost:8000/api
+```
+4. **Lancer** le projet
+```bash
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Structure du projet
+```bash
+src/
+├── api/            # Configuration Axios
+├── components/     # Composants réutilisables (Navbar, Layout, ProtectedRoute)
+├── context/        # AuthContext (Gestion du token et de l'utilisateur)
+├── pages/          # Pages principales (Auth, Clubs, MyClubs, Profile)
+└── App.tsx         # Configuration des routes
 ```
+## Backend 
+Ce projet nécessite l'API sports-club-api Backend (Symfony / API Platform) pour fonctionner correctement. Assurez-vous que le serveur backend est lancé.
+
