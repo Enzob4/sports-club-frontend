@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import api from "../api/axios";
 
 interface Club {
@@ -46,6 +47,9 @@ export default function Clubs() {
 
   return (
     <div style={{ padding: 20 }}>
+      <Link to="/create-club">
+        <button>Create Club</button>
+      </Link>
       <h1>Liste des Clubs</h1>
       <div style={{ display: "grid", gap: "20px" }}>
         {clubs.map((club) => (

@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import Profile from "./pages/Profile";
+import CreateClub from "./pages/CreateClub";
 
 function App() {
   const { isAuthenticated } = useAuth();
@@ -38,6 +39,14 @@ function App() {
         element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/create-club"
+        element={
+          <ProtectedRoute>
+            <CreateClub />
           </ProtectedRoute>
         }
       />

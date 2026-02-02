@@ -66,7 +66,7 @@ export default function Profile() {
             >
               <strong>{club.name}</strong>
               <p>{club.description}</p>
-              <p>Role: {club.role}</p>
+              <p>Role: {club.userRole}</p>
             </div>
           ))
         )}
