@@ -8,6 +8,7 @@ export default function Navbar() {
     <nav style={{ padding: 10, borderBottom: "1px solid #ccc" }}>
       <Link to="/clubs">Clubs</Link> |{" "}
       <Link to="/my-clubs">My Clubs</Link> |{" "}
+      <Link to="/profile">Profile</Link> |{" "}
       <button onClick={logout}>Logout</button>
     </nav>
   );

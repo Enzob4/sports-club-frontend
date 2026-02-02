@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../api/axios";
 
 interface Club {
-  "@id": string; // On ajoute l'IRI dans l'interface
+  "@id": string; 
   name: string;
   description: string;
 }
@@ -18,7 +18,6 @@ export default function Clubs() {
   const fetchClubs = async () => {
     try {
       const response = await api.get("/clubs");
-      // On récupère le tableau dans 'member' ou 'hydra:member'
       const data = response.data["member"] || response.data["hydra:member"] || [];
       setClubs(data);
     } catch (err) {
@@ -30,7 +29,6 @@ export default function Clubs() {
 
   const joinClub = async (clubIri: string) => {
     try {
-      // On extrait l'ID (le chiffre à la fin) de l'IRI "/api/clubs/5"
       const id = clubIri.split("/").pop(); 
       
       await api.post(`/clubs/${id}/join`);
@@ -54,7 +52,6 @@ export default function Clubs() {
           <div key={club["@id"]} style={{ border: "1px solid #ccc", padding: 15 }}>
             <h3>{club.name}</h3>
             <p>{club.description}</p>
-            {/* On passe le club["@id"] à la fonction */}
             <button onClick={() => joinClub(club["@id"])}>
               Rejoindre
             </button>

@@ -5,6 +5,7 @@ import MyClubs from "./pages/MyClubs";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
+import Profile from "./pages/Profile";
 
 function App() {
   const { isAuthenticated } = useAuth();
@@ -32,6 +33,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
       </Routes>
     </BrowserRouter>
   );
