@@ -12,7 +12,7 @@ sports-club est une plateforme moderne de gestion de clubs sportifs. Cette inter
 
 - Profil Utilisateur : Espace personnel avec récupération dynamique des données.
 
-- Design Premium : Interface responsive bâtie avec Tailwind CSS v4 et effets de glassmorphism.
+- Design Premium : Interface responsive bâtie avec Tailwind CSS v4.
 
 ## Stack Technique
 - Framework : React (Vite.js)
@@ -29,22 +29,34 @@ sports-club est une plateforme moderne de gestion de clubs sportifs. Cette inter
 
 ## Installation
 
-1. **Cloner** le dépôt
+1. **Créer** un dossier
+```bash
+mkdir sports-club
+cd sports-club
+```
+2. **Cloner** les dépôts
 ```bash
 git clone https://github.com/Enzob4/sports-club-frontend.git
-cd sports-club-front
+git clone https://github.com/Enzob4/sports-club-api.git
 ```
-2. **Installer** les dépendances
+3. **Démarrer** docker
 ```bash
-npm install
+cd sports-club-api
+docker compose up -d
 ```
-3. **Configuration** Créez un fichier .env à la racine et configurez l'URL de votre API Symfony
+4. **Génerer** les clés de sécurité
 ```bash
-VITE_API_BASE_URL=http://localhost:8000/api
+docker compose exec backend php bin/console lexik:jwt:generate-keypair
 ```
-4. **Lancer** le projet
+5. **Créer et charger** la base de données et les fixtures
 ```bash
-npm run dev
+docker compose exec backend php bin/console doctrine:migrations:migrate --no-interaction
+docker compose exec backend php bin/console doctrine:fixtures:load --no-interaction
+```
+6. **Se connecter** à http://localhost:3000/
+```bash
+admin@example.com
+password
 ```
 
 ## Structure du projet
@@ -57,5 +69,5 @@ src/
 └── App.tsx         # Configuration des routes
 ```
 ## Backend 
-Ce projet nécessite l'API sports-club-api Backend (Symfony / API Platform) pour fonctionner correctement. Assurez-vous que le serveur backend est lancé.
+Ce projet nécessite l'API sports-club-api Backend (Symfony / API Platform) pour fonctionner correctement.
 
